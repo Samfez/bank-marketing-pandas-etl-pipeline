@@ -9,15 +9,15 @@ An ETL pipeline that turns a flat, inconsistently formatted bank marketing expor
 
 ## Overview
 
-A Portuguese bank ran a telemarketing campaign to sell term deposits. The raw export mixes three kinds of data in one table: client demographics, campaign interactions and macroeconomic indicators. It also stores booleans as `"yes"`/`"no"`/`"unknown"` strings, splits dates across separate columns and uses inconsistent category labels.
+A bank ran a telemarketing campaign to sell term deposits. The raw export mixes three kinds of data in one table: client demographics, campaign interactions and macroeconomic indicators. It also stores booleans as `"yes"`/`"no"`/`"unknown"` strings, splits dates across separate columns and uses inconsistent category labels.
 
 This project **extracts** the raw CSV, **transforms** it into normalized and correctly typed DataFrames, and **loads** them as three CSV files whose schemas line up with a PostgreSQL database design.
 
-| | |
-|---|---|
-| **Input** | 1 CSV · 41,188 rows · 16 columns |
+|            |                                                                  |
+| ---------- | ---------------------------------------------------------------- |
+| **Input**  | 1 CSV · 41,188 rows · 16 columns                                 |
 | **Output** | 3 CSVs (`client`, `campaign`, `economics`) joined on `client_id` |
-| **Stack** | Python 3.12, pandas, NumPy, python-dotenv, Jupyter |
+| **Stack**  | Python 3.12, pandas, NumPy, python-dotenv, Jupyter               |
 
 ## Pipeline
 
@@ -42,50 +42,50 @@ data/processed/
 
 ## Transformations
 
-| Table | Column | Raw value | Clean value |
-|---|---|---|---|
-| `client` | `job` | `admin.` | `admin_` |
-| `client` | `education` | `basic.4y` · `unknown` | `basic_4y` · `NaN` |
-| `client` | `credit_default`, `mortgage` | `yes` · `no` · `unknown` | `True` · `False` · `False` |
-| `campaign` | `campaign_outcome` | `yes` · `no` | `True` · `False` |
-| `campaign` | `previous_outcome` | `success` · `failure` · `nonexistent` | `True` · `False` · `False` |
-| `campaign` | `last_contact_date` | `day=13`, `month=may` | `2022-05-13` |
+| Table      | Column                       | Raw value                             | Clean value                |
+| ---------- | ---------------------------- | ------------------------------------- | -------------------------- |
+| `client`   | `job`                        | `admin.`                              | `admin_`                   |
+| `client`   | `education`                  | `basic.4y` · `unknown`                | `basic_4y` · `NaN`         |
+| `client`   | `credit_default`, `mortgage` | `yes` · `no` · `unknown`              | `True` · `False` · `False` |
+| `campaign` | `campaign_outcome`           | `yes` · `no`                          | `True` · `False`           |
+| `campaign` | `previous_outcome`           | `success` · `failure` · `nonexistent` | `True` · `False` · `False` |
+| `campaign` | `last_contact_date`          | `day=13`, `month=may`                 | `2022-05-13`               |
 
-> **Design decision:** `"unknown"` is mapped to `False` for `credit_default` and `mortgage`, following the target schema, which requires non-null booleans. Note that this is a business assumption: 8,597 rows have an unknown default status, while only 3 rows report an actual default.
+> **Design decision:** `"unknown"` is mapped to `False` for `credit_default` and `mortgage`, following the target schema, which requires non-null booleans. This is a business assumption: 8,597 rows have an unknown default status, while only 3 rows report an actual default.
 
 ## Output schema
 
 **`client.csv`**
 
-| Column | Type | Description |
-|---|---|---|
-| `client_id` | int | Primary key |
-| `age` | int | Client age |
-| `job` | str | Job category |
-| `marital` | str | Marital status |
-| `education` | str (nullable) | Education level |
-| `credit_default` | bool | Whether the client has credit in default |
-| `mortgage` | bool | Whether the client has a mortgage |
+| Column           | Type           | Description                              |
+| ---------------- | -------------- | ---------------------------------------- |
+| `client_id`      | int            | Primary key                              |
+| `age`            | int            | Client age                               |
+| `job`            | str            | Job category                             |
+| `marital`        | str            | Marital status                           |
+| `education`      | str (nullable) | Education level                          |
+| `credit_default` | bool           | Whether the client has credit in default |
+| `mortgage`       | bool           | Whether the client has a mortgage        |
 
 **`campaign.csv`**
 
-| Column | Type | Description |
-|---|---|---|
-| `client_id` | int | Foreign key → `client` |
-| `number_contacts` | int | Contacts made during this campaign |
-| `contact_duration` | int | Last contact duration (seconds) |
-| `previous_campaign_contacts` | int | Contacts made before this campaign |
-| `previous_outcome` | bool | Whether the previous campaign succeeded |
-| `campaign_outcome` | bool | Whether the client subscribed to a term deposit |
-| `last_contact_date` | date | Date of last contact (`YYYY-MM-DD`) |
+| Column                       | Type | Description                                     |
+| ---------------------------- | ---- | ----------------------------------------------- |
+| `client_id`                  | int  | Foreign key → `client`                          |
+| `number_contacts`            | int  | Contacts made during this campaign              |
+| `contact_duration`           | int  | Last contact duration (seconds)                 |
+| `previous_campaign_contacts` | int  | Contacts made before this campaign              |
+| `previous_outcome`           | bool | Whether the previous campaign succeeded         |
+| `campaign_outcome`           | bool | Whether the client subscribed to a term deposit |
+| `last_contact_date`          | date | Date of last contact (`YYYY-MM-DD`)             |
 
 **`economics.csv`**
 
-| Column | Type | Description |
-|---|---|---|
-| `client_id` | int | Foreign key → `client` |
-| `cons_price_idx` | float | Consumer price index (monthly) |
-| `euribor_three_months` | float | 3-month Euribor rate (daily) |
+| Column                 | Type  | Description                    |
+| ---------------------- | ----- | ------------------------------ |
+| `client_id`            | int   | Foreign key → `client`         |
+| `cons_price_idx`       | float | Consumer price index (monthly) |
+| `euribor_three_months` | float | 3-month Euribor rate (daily)   |
 
 ## Project structure
 
@@ -134,7 +134,7 @@ RAW_FILE_NAME=bank_marketing.csv
 
 ### 3. Getting the data
 
-The dataset is not tracked in this repository. Download `bank_marketing.csv` from the DataCamp project *"Cleaning Bank Marketing Data"* and place it in `data/raw/`. That file is a preprocessed version of the [UCI Bank Marketing dataset](https://archive.ics.uci.edu/dataset/222/bank+marketing).
+The dataset is not tracked in this repository. Download `bank_marketing.csv` from the DataCamp project _"Cleaning Bank Marketing Data"_ and place it in `data/raw/`. That file is a preprocessed version of the [UCI Bank Marketing dataset](https://archive.ics.uci.edu/dataset/222/bank+marketing).
 
 Expected format: 41,188 rows, comma-separated, with these columns:
 
@@ -175,7 +175,7 @@ The notebook is committed with its outputs, so you can review every step and its
 ## Roadmap
 
 - [ ] Refactor the notebook into a modular `src/` package (`extract.py`, `transform.py`, `load.py`) with a CLI entry point
-- [ ] Add data validation tests (pytest / pandera)
+- [ ] Add data validation tests (pytest)
 - [ ] Load the output directly into PostgreSQL with SQLAlchemy
 - [ ] Add CI with GitHub Actions
 
